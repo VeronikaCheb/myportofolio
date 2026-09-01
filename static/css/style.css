@@ -5,12 +5,13 @@
 }
 
 :root {
-    --ink: #1c1917;
-    --paper: #faf6f0;
-    --accent: #d95d39;
-    --accent-dark: #a8442a;
-    --line: #e3d9c9;
-    --text-muted: #6b6459;
+    --ink: #00674F;
+    --paper: #d3d3d3;
+    --accent: #800000;
+    --accent-dark: #a01326;
+    --line: #800000;
+    --text-muted: #060606;
+    --tools: #909090;
     --radius: 4px;
 }
 
@@ -131,7 +132,7 @@ h1, .brand {
     font-weight: 600;
     text-decoration: none;
     color: var(--paper);
-    background-color: var(--ink);
+    background-color: var(--tools);
     border-radius: var(--radius);
     padding: 0.5rem 1.1rem;
     transition: background-color 0.2s ease;
