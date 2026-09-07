@@ -7,9 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+
     <header class="site-header">
         <div class="container">
             <a href="#profile" class="brand">Veronika</a>
@@ -28,10 +30,41 @@
                 </div>
                 <div class="hero-photo">
                     <div class="photo-block"></div>
-                    <img class="avatar" src="/static/img/veronika.JPG" alt="Photo of Veronika">
+                    <img class="avatar" src="{% static 'img/veronika.JPG' %}" alt="Photo of Veronika">
                 </div>
                 <div class="hero-details">
-                    <p class="bio">Exchange student for this semester. I came from Russia and really approciate this experience!</p>
+                    <p class="bio">Exchange student for this semester. I came from Russia and really appreciate this experience!</p>
+
+                    <!-- ===== CAROUSEL 1 ===== -->
+                    <div class="carousel">
+                        <div class="carousel-track">
+                            <img src="{% static 'img/image1.png' %}" alt="Skills 1" id="slide1">
+                            <img src="{% static 'img/image2.png' %}" alt="Skills 2" id="slide2">
+                        </div>
+                        <a href="#slide2" class="carousel-btn next show-on-1">❯</a>
+                        <a href="#slide1" class="carousel-btn prev show-on-2">❮</a>
+                    </div>
+
+                    <!-- ===== CAROUSEL 2 ===== -->
+                    <div class="carousel">
+                        <div class="carousel-track">
+                            <img src="{% static 'img/image3.png' %}" alt="Skills 3" id="slide3">
+                            <img src="{% static 'img/image4.png' %}" alt="Skills 4" id="slide4">
+                        </div>
+                        <a href="#slide4" class="carousel-btn next show-on-3">❯</a>
+                        <a href="#slide3" class="carousel-btn prev show-on-4">❮</a>
+                    </div>
+
+                    <!-- ===== CAROUSEL 3 ===== -->
+                    <div class="carousel">
+                        <div class="carousel-track">
+                            <img src="{% static 'img/image5.png' %}" alt="Skills 5" id="slide5">
+                            <img src="{% static 'img/image6.png' %}" alt="Skills 6" id="slide6">
+                        </div>
+                        <a href="#slide6" class="carousel-btn next show-on-5">❯</a>
+                        <a href="#slide5" class="carousel-btn prev show-on-6">❮</a>
+                    </div>
+
                     <dl class="meta-list">
                         <div class="meta-row">
                             <dt>NPM</dt>
@@ -44,8 +77,8 @@
                     </dl>
                     <div class="social-links">
                         <a href="https://github.com/VeronikaCheb/myportofolio" class="social-link">GitHub</a>
-                        <a href="https://github.com/VeronikaCheb" class="social-link">LinkedIn</a>
-                        <a href="tilch1709@gmail.com" class="social-link">Email</a>
+                        <a href="https://linkedin.com/in/veronika-chebotareva" class="social-link">LinkedIn</a>
+                        <a href="mailto:tilch1709@gmail.com" class="social-link">Email</a>
                     </div>
                 </div>
             </div>
@@ -57,5 +90,6 @@
             <p>&copy; 2026 Veronika. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
         </div>
     </footer>
+
 </body>
 </html>
