@@ -45,7 +45,7 @@ The website is fully responsive and works on both desktop and mobile devices.
 
 ### Assignment 1
 
-1. In my work I used semantic HTML5 elements such as <header>, <nav>, <section>, etc. These elements do not change appearance but they make my code logical and make it easier to understand and change parts of code. Also it helps to separate information in the code and makes it simpler to apply style in CSS. For example, using <nav> clearly identifies the navigation block, which helps both developers and screen readers understand the page structure.
+1. In my work I used semantic HTML5 elements such as `header`, `nav`, `section`, etc. These elements do not change appearance but they make my code logical and make it easier to understand and change parts of code. Also it helps to separate information in the code and makes it simpler to apply style in CSS. For example, using `nav` clearly identifies the navigation block, which helps both developers and screen readers understand the page structure.
 
 2. I had problems with grid: it works really well on laptop, but fails on mobile phone. Also there were problems with the size of photos, carousel section and tools, so I set size and line break using CSS properties like `flex-wrap` and `max-width` to make elements adapt to smaller screens.. To decide what changes I really needed I just opened the website on laptop then on mobile phone.
 
