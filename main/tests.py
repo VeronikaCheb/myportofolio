@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Experience
+from main.models import Experience, Project
 
 
 class MainTest(TestCase):
@@ -56,3 +56,24 @@ class MainTest(TestCase):
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, "Completed")
         self.assertNotContains(response, "Ongoing")
+
+def test_project_url_is_accessible(self):
+    response = self.client.get(reverse("main:show_project"))
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, "project.html")
+
+def test_project_data_appears_in_html(self):
+    Project.objects.create(
+        title="Recyclables collector",
+        description="Prototype of the mobile application.",
+        category="app",
+        is_completed=False,
+    )
+    response = self.client.get(reverse("main:show_project"))
+    self.assertContains(response, "Recyclables collector")
+    self.assertContains(response, "Prototype of the mobile application.")
+
+def test_empty_project_page(self):
+    Project.objects.all().delete()
+    response = self.client.get(reverse("main:show_project"))
+    self.assertContains(response, "No projects have been added yet.")
