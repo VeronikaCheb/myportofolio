@@ -40,9 +40,9 @@ Once the server is running, you can explore the following features:
 
 Profile page (/): Learn about my academic background, read a short bio, and find links to my GitHub, LinkedIn, and Email.
 
-Experience page (/experience/): See my roles and activities, such as President of the Student Council of SPbU, Olympiad Mathematics Instructor, and Event Organizer. Each entry shows a category, title, description, and status (Ongoing or Completed).
+Experience page (/experience/): See my roles and activities, such as President of the Student Council of SPbU, Olympiad Mathematics Instructor, and Event Organizer. Each entry shows a category, title, description, and status (Ongoing or Completed). Also you can edit or add information about new achievements.
 
-Projects page (/project/): Browse my projects, including Recyclables collector, The future of Kamchatka, Fullerene hybrid with heavy atoms, and SVM for regression tasks. Each project shows a category, title, description, and completion status.
+Projects page (/project/): Browse my projects, including Recyclables collector, The future of Kamchatka, Fullerene hybrid with heavy atoms, and SVM for regression tasks. Each project shows a category, title, description, and completion status. Also you can edit or add information about new projects.
 
 Contact Links: Click on the social links to visit my GitHub to explore my code and repositories, LinkedIn to connect with me professionally, or Email to send me a message directly (opens your default email client).
 
@@ -76,3 +76,14 @@ I added a Project model. I run python manage.py makemigrations, Django creates 0
 
 #### AI disclosure
 Tutorial 2 was sufficient to complete the task. To answer the questions and study some code blocks, I used ChatGPT to figure things out.
+
+### Assignement 3
+
+1. Using ModelForm, you don’t need to write <input> for each field, and it can save data to the database on its own via form.save(). This results in less code, fewer errors, and a always up‑to‑date connection with the model. {% csrf_token %} is required because Django protects forms from CSRF attacks: this is a standard security measure; without it, the form simply cannot be submitted.
+
+2. JSON is lighter and more compact — it’s smaller in size and parses faster. Its syntax matches that of JavaScript objects, so in the browser it can be used directly via JSON.XML requires building a tree of nodes and traversing it, which is more complex. 
+
+3. When a request arrives for a URL like /api/projects/, Django calls the view function. It calls Project.objects.all(), retrieves the QuerySet from the database. But Python objects and QuerySet cannot be sent directly in an HTTP response — they need to be converted into text. To do this, use serializers.serialize("json", projects) — it converts objects into a JSON string. Then HttpResponse(..., content_type="application/js
+
+#### AI disclosure
+Tutorial 3 was sufficient to complete the task, but i had some questions about update functions so I asked Chat for commands.
