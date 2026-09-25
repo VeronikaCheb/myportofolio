@@ -44,6 +44,17 @@ Experience page (/experience/): See my roles and activities, such as President o
 
 Projects page (/project/): Browse my projects, including Recyclables collector, The future of Kamchatka, Fullerene hybrid with heavy atoms, and SVM for regression tasks. Each project shows a category, title, description, and completion status. Also you can edit or add information about new projects.
 
+isitors can register a new account at /register/ and log in at /login/. After logging in, the navbar shows the username and a Logout button. Logged-out visitors only see Login and Register. The portfolio pages remain readable without an account.
+
+**Roles and permissions:**
+- Visitors (not logged in) can read all pages, but must log in before starring or managing data.
+- Registered users can read pages and give or remove stars on Experience and Projects.
+- Editors (assigned through Django Admin, in the Editor group) can additionally update existing Experience entries.
+- Portfolio owner (superuser) can create, update, and delete Experience and Projects, and has all regular-user permissions.
+
+Action buttons are hidden in the interface when the current user is not allowed to use them, and the server enforces the same rules so direct URL access returns HTTP 403 Forbidden.
+
+
 Contact Links: Click on the social links to visit my GitHub to explore my code and repositories, LinkedIn to connect with me professionally, or Email to send me a message directly (opens your default email client).
 
 The website is fully responsive and works on both desktop and mobile devices.

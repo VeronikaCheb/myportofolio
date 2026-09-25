@@ -43,7 +43,9 @@ def get_experience_json(request):
     experiences = Experience.objects.all()
     if title_query:
         experiences = experiences.filter(title__icontains=title_query)
-    data = serializers.serialize("json", experiences)
+    data = serializers.serialize(
+        "json", experiences, use_natural_foreign_keys=True
+    )
     return HttpResponse(data, content_type="application/json")
 
 def show_experience(request):
@@ -58,10 +60,14 @@ def show_experience(request):
         "name": "Veronika",
         "experience_list": experiences,
         "title_query": title_query,
+        "is_editor": request.user.is_authenticated and is_editor(request.user),
     }
     return render(request, "experience.html", context)
 
+@login_required(login_url="/login/")
 def create_experience(request):
+    if not (request.user.is_superuser or is_editor(request.user)):
+        raise PermissionDenied
     form = ExperienceForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -84,12 +90,30 @@ def update_experience(request, experience_id):
     context = {"name": "Veronika", "form": form, "experience": experience}
     return render(request, "experience_form.html", context)
 
+@login_required(login_url="/login/")
 def delete_experience(request, experience_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     experience = get_object_or_404(Experience, pk=experience_id)
 
     if request.method == "POST":
         experience.delete()
         messages.success(request, "Experience deleted!")
+    return redirect("main:show_experience")
+
+def is_editor(user):
+    return user.groups.filter(name="Editor").exists()
+
+@login_required(login_url="/login/")
+def toggle_star_experience(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+
+    if request.method == "POST":
+        if request.user in experience.starred_by.all():
+            experience.starred_by.remove(request.user)
+        else:
+            experience.starred_by.add(request.user)
+
     return redirect("main:show_experience")
 
 def get_projects_json(request):
