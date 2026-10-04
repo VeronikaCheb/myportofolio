@@ -36,26 +36,36 @@ And add your IP address to ALLOWED_HOSTS in settings.py:
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.34"]
 
 ### How to Use the Website
+
 Once the server is running, you can explore the following features:
 
-Profile page (/): Learn about my academic background, read a short bio, and find links to my GitHub, LinkedIn, and Email.
+**Profile page (/):** Learn about my academic background, read a short bio, find links to my GitHub, LinkedIn, and Email, and see the time of your last login session.
 
-Experience page (/experience/): See my roles and activities, such as President of the Student Council of SPbU, Olympiad Mathematics Instructor, and Event Organizer. Each entry shows a category, title, description, and status (Ongoing or Completed). Also you can edit or add information about new achievements.
+**Experience page (/experience/):** See my roles and activities, such as President of the Student Council of SPbU, Olympiad Mathematics Instructor, and Event Organizer. Each entry shows a category, title, description, and status (Ongoing or Completed). The list is loaded through AJAX, so the page skeleton appears first and the data is fetched from the JSON endpoint afterwards. The search field filters entries as you type, without reloading the page. Logged-in users can give or remove a star on each entry, and the star count is shown next to the button.
 
-Projects page (/project/): Browse my projects, including Recyclables collector, The future of Kamchatka, Fullerene hybrid with heavy atoms, and SVM for regression tasks. Each project shows a category, title, description, and completion status. Also you can edit or add information about new projects.
+**Projects page (/project/):** Browse my projects, including Recyclables collector, The future of Kamchatka, Fullerene hybrid with heavy atoms, and SVM for regression tasks. Each project shows a category, title, description, and completion status. The list is also loaded via AJAX with debounced search, and logged-in users can star projects.
 
-isitors can register a new account at /register/ and log in at /login/. After logging in, the navbar shows the username and a Logout button. Logged-out visitors only see Login and Register. The portfolio pages remain readable without an account.
+**Authentication:** Visitors can register at /register/ and log in at /login/. After logging in, the navbar shows the username and a Logout button. Logged-out visitors only see Login and Register. All portfolio pages remain readable without an account.
 
 **Roles and permissions:**
 - Visitors (not logged in) can read all pages, but must log in before starring or managing data.
 - Registered users can read pages and give or remove stars on Experience and Projects.
-- Editors (assigned through Django Admin, in the Editor group) can additionally update existing Experience entries.
+- Editors (assigned through Django Admin, in the *Editor* group) can additionally update existing Experience entries.
 - Portfolio owner (superuser) can create, update, and delete Experience and Projects, and has all regular-user permissions.
 
 Action buttons are hidden in the interface when the current user is not allowed to use them, and the server enforces the same rules so direct URL access returns HTTP 403 Forbidden.
 
+**Adding data:** The add form opens in a modal on the list page (Popover API) instead of a separate page. The submission goes through the Fetch API with an X-CSRFToken header, and the list refreshes without a page reload. The server returns 201 on success, 400 on validation errors, and 403 for users without permission. On success a green toast appears; on failure a red toast shows the error message from the server.
 
-Contact Links: Click on the social links to visit my GitHub to explore my code and repositories, LinkedIn to connect with me professionally, or Email to send me a message directly (opens your default email client).
+**Search:** Both Experience and Projects support AJAX search with debouncing (a request is only sent 300 ms after the user stops typing).
+
+**XSS protection:** All text coming from JSON is escaped on the client through an `escapeHtml()` helper before being inserted with `innerHTML`, and on the server `strip_tags` is applied inside the `clean_<field>` methods of both ModelForms.
+
+**JSON API:** Data is also available in JSON format:
+- /api/experience/ — all experience entries (optional `?title=` filter)
+- /api/projects/ — all projects (optional `?title=` filter)
+
+**Contact Links:** Click on the social links to visit my GitHub to explore my code and repositories, LinkedIn to connect with me professionally, or Email to send me a message directly (opens your default email client).
 
 The website is fully responsive and works on both desktop and mobile devices.
 
@@ -98,3 +108,11 @@ Tutorial 2 was sufficient to complete the task. To answer the questions and stud
 
 #### AI disclosure
 Tutorial 3 was sufficient to complete the task, but i had some questions about update functions so I asked Chat for commands.
+
+### Assignment 5
+
+1. Debouncing means delaying a function call until the event has stopped repeating. In AJAX search, without debouncing every typed character would send a separate request: the word django would produce 6 requests. That is extra load on the server and a risk that older responses arrive later than newer ones and overwrite the result. With debouncing we set a setTimeout of 300 ms and reset it with clearTimeout on every keystroke — so the request is sent only once, when the user stops typing.
+
+2. fetch() returns a Promise, not the data itself. await makes the code wait until the Promise resolves and only then continue. Without it, we get the Promise instead of the Response object, and the next line such as response.json() will fail because a Promise has no such method. In other words, without await the code moves on before the data arrives, and everything breaks.
+
+3. XSS is the injection of someone else's JavaScript into a page, which then runs in other users' browsers. Django templates escape < and > so tags are displayed as plain text. AJAX does not do this: the data comes as JSON and is inserted through innerHTML, where the browser treats it as real HTML and executes it. That is why every value must be passed through escapeHtml() before insertion, and on the server it should also be cleaned with strip_tags inside the form.

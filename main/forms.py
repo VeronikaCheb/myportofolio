@@ -22,6 +22,7 @@ class ProjectForm(forms.ModelForm):
     def clean_description(self):
         return strip_tags(self.cleaned_data["description"]).strip()
 
+
 class ExperienceForm(forms.ModelForm):
     class Meta:
         model = Experience
@@ -39,4 +40,13 @@ class ExperienceForm(forms.ModelForm):
             'category': forms.Select(),
             'thumbnail': forms.URLInput(attrs={'placeholder': 'https://...'}),
             'ended_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }        
+        }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Title can't contain only HTML tags.")
+        return title
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
