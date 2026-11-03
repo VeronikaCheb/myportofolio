@@ -45,6 +45,39 @@
 {% if user.is_superuser %}
     {% include "components/experience_form_modal.html" %}
 {% endif %}
+
+<!-- Модалка для редактирования -->
+<div id="edit-experience-modal" class="project-form-modal" popover="auto" role="dialog" aria-modal="true">
+    <div class="project-form-modal__content">
+        <button type="button" class="project-form-modal__close" popovertarget="edit-experience-modal" popovertargetaction="hide">×</button>
+        <h2>Edit Experience</h2>
+        <form id="edit-experience-form" class="project-form">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" id="edit-title" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" id="edit-description" class="form-input" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category" id="edit-category" class="form-input">
+                    <option value="internship">Internship</option>
+                    <option value="research">Research</option>
+                    <option value="volunteer">Volunteer</option>
+                    <option value="part-time">Part-Time</option>
+                    <option value="full-time">Full-Time</option>
+                    <option value="freelance">Freelance</option>
+                    <option value="organizer">Main Organizer</option>
+                </select>
+            </div>
+            <div class="project-form-modal__actions">
+                <button type="submit" class="button">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock content %}
 
 {% block scripts %}
@@ -55,6 +88,7 @@ const STAR_EXPERIENCE_ENDPOINT = "{% url 'api:experience-star' '00000000-0000-00
 const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
 const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
 const IS_EDITOR = "{{ is_editor|yesno:'true,false' }}" === "true";
+
 const loadingState = document.getElementById('loading');
 const errorState = document.getElementById('error');
 const emptyState = document.getElementById('empty');
@@ -64,6 +98,11 @@ const searchInput = document.getElementById('search-input');
 const experienceForm = document.getElementById('experience-form');
 let experiencesAbortController;
 let searchDebounceTimer;
+
+// Логика редактирования
+const editModal = document.getElementById('edit-experience-modal');
+const editForm = document.getElementById('edit-experience-form');
+let currentEditId = null;
 
 function getCookie(name) {
     const prefix = `${name}=`;
@@ -96,7 +135,6 @@ function buildExperienceCardElement(experience) {
     const article = document.createElement('article');
     article.className = 'experience-card';
     
-    // Определяем, можно ли редактировать
     const canEdit = IS_SUPERUSER || IS_EDITOR;
 
     const star = IS_AUTHENTICATED
@@ -107,8 +145,12 @@ function buildExperienceCardElement(experience) {
            </button>`
         : `<a href="{% url 'main:login' %}" class="button">Login to star (${experience.star_count})</a>`;
 
-    const editLink = canEdit
-        ? `<a href="/experience/${escapeHtml(experience.id)}/update/" class="button button-secondary">Edit</a>`
+    const editButton = canEdit 
+        ? `<button type="button" class="button button-secondary" data-action="edit"
+                   data-id="${escapeHtml(experience.id)}"
+                   data-title="${escapeHtml(experience.title)}"
+                   data-description="${escapeHtml(experience.description)}"
+                   data-category="${escapeHtml(experience.category)}">Edit</button>`
         : '';
 
     const remove = IS_SUPERUSER
@@ -121,8 +163,8 @@ function buildExperienceCardElement(experience) {
         <h2>${escapeHtml(experience.title)}</h2>
         <p class="experience-description">${escapeHtml(experience.description)}</p>
         <div class="project-actions">
-            ${editLink}
             ${star}
+            ${editButton}
             ${remove}
         </div>
     `;
@@ -209,6 +251,16 @@ gridContainer.addEventListener('click', async function (event) {
     if (!button || button.disabled) return;
 
     const action = button.dataset.action;
+
+    if (action === 'edit') {
+        currentEditId = button.dataset.id;
+        document.getElementById('edit-title').value = button.dataset.title;
+        document.getElementById('edit-description').value = button.dataset.description;
+        document.getElementById('edit-category').value = button.dataset.category;
+        editModal.showPopover();
+        return;
+    }
+
     if (action === 'delete' && !window.confirm('Delete this experience?')) return;
 
     button.disabled = true;
@@ -224,6 +276,31 @@ gridContainer.addEventListener('click', async function (event) {
         showToast('Request failed', error.message, 'error');
     } finally {
         button.disabled = false;
+    }
+});
+
+// Обработчик формы редактирования
+editForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const btn = editForm.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    
+    const payload = {
+        title: document.getElementById('edit-title').value,
+        description: document.getElementById('edit-description').value,
+        category: document.getElementById('edit-category').value,
+    };
+
+    try {
+        const url = experienceEndpoint(DETAIL_EXPERIENCE_ENDPOINT, currentEditId);
+        await writeExperience(url, 'PATCH', payload);
+        editModal.hidePopover();
+        showToast('Success', 'Experience updated.', 'success');
+        await fetchExperiences(searchInput.value.trim());
+    } catch (error) {
+        showToast('Could not update', error.message, 'error');
+    } finally {
+        btn.disabled = false;
     }
 });
 

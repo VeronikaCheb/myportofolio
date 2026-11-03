@@ -118,3 +118,19 @@ Tutorial 3 was sufficient to complete the task, but i had some questions about u
 2. fetch() returns a Promise, not the data itself. await makes the code wait until the Promise resolves and only then continue. Without it, we get the Promise instead of the Response object, and the next line such as response.json() will fail because a Promise has no such method. In other words, without await the code moves on before the data arrives, and everything breaks.
 
 3. XSS is the injection of someone else's JavaScript into a page, which then runs in other users' browsers. Django templates escape < and > so tags are displayed as plain text. AJAX does not do this: the data comes as JSON and is inserted through innerHTML, where the browser treats it as real HTML and executes it. That is why every value must be passed through escapeHtml() before insertion, and on the server it should also be cleaned with strip_tags inside the form.
+
+### Assignment 6
+
+1. **What REST means and why JSON alone isn't enough. PUT vs PATCH:**
+REST (Representational State Transfer) is an architectural style for designing APIs. It means treating data as resources (accessed via URLs) and using HTTP methods (GET, POST, PUT, PATCH, DELETE) to perform actions on them. Simply returning JSON doesn't make an API RESTful; it also needs to be stateless and follow the proper resource-based URL structure. The difference between PUT and PATCH is that PUT replaces the entire resource (if you omit a field, it might be cleared), whereas PATCH only updates the specific fields provided. For example, if a user only wants to change their bio, PATCH is better to avoid accidentally wiping out their profile picture.
+
+2. **The role of a serializer in DRF and its advantages:**
+A serializer converts complex data types (like Django models) into native Python datatypes that can be rendered into JSON, and vice versa (deserialization/validation). Its advantage over manually assembling a dictionary with `JsonResponse` is that it automatically handles validation, field-level cleaning (like `strip_tags`), and the saving process (`save()`). It also makes the code much cleaner and easier to maintain, especially when adding computed fields (like `star_count`).
+
+3. **Authentication vs Authorization, and why server-side checks matter:**
+Authentication is verifying *who* the user is (e.g., checking their session). Authorization is verifying *what* they are allowed to do (e.g., only Editors can PATCH). Access rights must be checked with a permission class on the server because hiding a button in the HTML template only affects the UI. A malicious user can easily bypass the UI and send a direct HTTP request (via Postman or the console) to the API endpoint. If the server doesn't check permissions, the data will be compromised.
+
+4. **Why CSRF is needed with SessionAuthentication and why `force_authenticate` isn't enough to test it:**
+When using SessionAuthentication, the browser automatically sends the session cookie with every request. This makes the API vulnerable to Cross-Site Request Forgery (CSRF), where a malicious site tricks the user's browser into making an unwanted request. The CSRF token proves the request originated from our own frontend. `force_authenticate` bypasses the entire authentication middleware, including CSRF checks, so it cannot prove that CSRF protection works. To test CSRF, we must use `APIClient(enforce_csrf_checks=True)` and a real `.login()` to simulate a real browser request without a token, ensuring the server rejects it with a 403 status.
+
+**How AI helped:** I asked it to generate the basic structure for the `edit-experience-modal` and a function to handle the PATCH request via `fetch()`.
