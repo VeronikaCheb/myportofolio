@@ -43,6 +43,8 @@ Once the server is running, you can explore the following features:
 
 **Experience page (/experience/):** See my roles and activities, such as President of the Student Council of SPbU, Olympiad Mathematics Instructor, and Event Organizer. Each entry shows a category, title, description, and status (Ongoing or Completed). The list is loaded through AJAX, so the page skeleton appears first and the data is fetched from the JSON endpoint afterwards. The search field filters entries as you type, without reloading the page. Logged-in users can give or remove a star on each entry, and the star count is shown next to the button.
 
+**Django REST Framework API** via AJAX, so the page skeleton appears first and the data is fetched from the API endpoint afterwards. The search field filters entries as you type, without reloading the page. Logged-in users can give or remove a star on each entry, and the star count is shown next to the button.
+
 **Projects page (/project/):** Browse my projects, including Recyclables collector, The future of Kamchatka, Fullerene hybrid with heavy atoms, and SVM for regression tasks. Each project shows a category, title, description, and completion status. The list is also loaded via AJAX with debounced search, and logged-in users can star projects.
 
 **Authentication:** Visitors can register at /register/ and log in at /login/. After logging in, the navbar shows the username and a Logout button. Logged-out visitors only see Login and Register. All portfolio pages remain readable without an account.
@@ -62,8 +64,8 @@ Action buttons are hidden in the interface when the current user is not allowed 
 **XSS protection:** All text coming from JSON is escaped on the client through an `escapeHtml()` helper before being inserted with `innerHTML`, and on the server `strip_tags` is applied inside the `clean_<field>` methods of both ModelForms.
 
 **JSON API:** Data is also available in JSON format:
-- /api/experience/ — all experience entries (optional `?title=` filter)
-- /api/projects/ — all projects (optional `?title=` filter)
+- /api/v1/experiences/ — all experience entries (optional `?title=` filter)
+- /api/v1/projects/ — all projects (optional `?title=` filter)
 
 **Contact Links:** Click on the social links to visit my GitHub to explore my code and repositories, LinkedIn to connect with me professionally, or Email to send me a message directly (opens your default email client).
 
